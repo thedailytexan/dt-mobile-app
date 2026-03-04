@@ -49,9 +49,10 @@ export const CATEGORY_IDS: Record<CategoryName, number> = {
 
 type ArticleCardProps = {
   category?: CategoryName;
+  index?: number;
 };
 
-export function ArticleCard({ category }: ArticleCardProps = {}) {
+export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
   const [post, setPost] = useState<WPPost | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +60,7 @@ export function ArticleCard({ category }: ArticleCardProps = {}) {
     const fetchLatestArticle = async () => {
       setLoading(true);
       try {
-        let url = 'https://thedailytexan.com/wp-json/wp/v2/posts?per_page=1&orderby=date&order=desc&_embed=1';
+        let url = `https://thedailytexan.com/wp-json/wp/v2/posts?per_page=1&orderby=date&order=desc&_embed=1&offset=${index}`;
         if (category && CATEGORY_IDS[category]) {
           url += `&categories=${CATEGORY_IDS[category]}`;
         }
@@ -78,7 +79,7 @@ export function ArticleCard({ category }: ArticleCardProps = {}) {
     };
 
     fetchLatestArticle();
-  }, [category]);
+  }, [category, index]);
 
   if (loading) {
     return (

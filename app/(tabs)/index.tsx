@@ -5,9 +5,9 @@ export default function Home() {
   return (
     <ScrollView contentContainerStyle={{ alignItems: "center", padding: 16 }}>
       <Text>News</Text>
-      <ArticleCard category="News" />
+      <ArticleCard category="News" index = {4} />
       <Text>Sports</Text>
-      <ArticleCard category="Sports" />
+      <ArticleCard category="Sports" index = {1} />
       <Text>Life&Arts</Text>
       <ArticleCard category="Life&Arts" />
       <Text>Projects</Text>
