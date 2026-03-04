@@ -29,19 +29,46 @@ const decodeHTMLEntities = (str: string) => {
     .replace(/&#8212;/g, '--');
 };
 
-export function ArticleCard() {
+export type CategoryName = 'News' | 'Sports' | 'Life&Arts' | 'Projects' | 'Opinion' | 'Multimedia' | 'Texan en Español' | 'Flipbooks / Print' | 'Obituaries' | 'Shorts' | 'Club Sports' | 'Editorials' | 'Columns';
+
+export const CATEGORY_IDS: Record<CategoryName, number> = {
+  'News': 218,
+  'Sports': 226,
+  'Life&Arts': 235,
+  'Projects': 22312,
+  'Opinion': 222,
+  'Multimedia': 256,
+  'Texan en Español': 15894,
+  'Flipbooks / Print': 12916,
+  'Obituaries': 15253,
+  'Shorts': 24867,
+  'Club Sports': 22986,
+  'Editorials': 13104,
+  'Columns': 223,
+};
+
+type ArticleCardProps = {
+  category?: CategoryName;
+};
+
+export function ArticleCard({ category }: ArticleCardProps = {}) {
   const [post, setPost] = useState<WPPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLatestArticle = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(
-          'https://thedailytexan.com/wp-json/wp/v2/posts?per_page=1&orderby=date&order=desc&_embed=1'
-        );
+        let url = 'https://thedailytexan.com/wp-json/wp/v2/posts?per_page=1&orderby=date&order=desc&_embed=1';
+        if (category && CATEGORY_IDS[category]) {
+          url += `&categories=${CATEGORY_IDS[category]}`;
+        }
+        const response = await fetch(url);
         const data = await response.json();
         if (data && data.length > 0) {
           setPost(data[0]);
+        } else {
+          setPost(null);
         }
       } catch (error) {
         console.error('Error fetching latest article:', error);
@@ -51,7 +78,7 @@ export function ArticleCard() {
     };
 
     fetchLatestArticle();
-  }, []);
+  }, [category]);
 
   if (loading) {
     return (
