@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { MediumArticleCard } from "../../src/components/medium-article-card";
 import { SmallArticleCard } from "../../src/components/small-article-card";
 
 export default function Sports() {
@@ -9,6 +10,7 @@ export default function Sports() {
         <SmallArticleCard category="Sports" index={0} />
         <SmallArticleCard category="Sports" index={1} />
       </View>
+      <MediumArticleCard category="Sports" index={1}/>
     </View>
   );
 }
