@@ -6,6 +6,7 @@ import { WPImage } from './wp-image';
 
 type WPPost = {
   id: number;
+  date: string;
   featured_media: number;
   title: {
     rendered: string;
@@ -100,29 +101,46 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
   }
 
   let authorName = 'Unknown Author';
+  let categoryName = category || '';
   if (post._embedded && post._embedded['wp:term']) {
     for (const terms of post._embedded['wp:term']) {
-      const staffTerm = terms.find((term) => term.taxonomy === 'staff_name');
-      if (staffTerm) {
-        authorName = staffTerm.name;
-        break;
+      if (authorName === 'Unknown Author') {
+        const staffTerm = terms.find((term) => term.taxonomy === 'staff_name');
+        if (staffTerm) {
+          authorName = staffTerm.name;
+        }
+      }
+      if (!categoryName) {
+        const categoryTerm = terms.find((term) => term.taxonomy === 'category');
+        if (categoryTerm) {
+          categoryName = decodeHTMLEntities(categoryTerm.name);
+        }
       }
     }
   }
+
+  const dateObj = new Date(post.date);
+  const formattedDate = dateObj.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const metaText = [authorName, categoryName, formattedDate].filter(Boolean).join(' | ');
 
   const decodedTitle = decodeHTMLEntities(post.title.rendered);
 
   return (
     <ThemedView style={styles.card}>
-      {post.featured_media > 0 && (
-        <WPImage imageid={post.featured_media} style={styles.image} />
-      )}
       <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
         {decodedTitle}
       </ThemedText>
       <ThemedText type="default" style={styles.author}>
-        {authorName}
+        {metaText}
       </ThemedText>
+      {post.featured_media > 0 && (
+        <WPImage imageid={post.featured_media} style={styles.image} />
+      )}
     </ThemedView>
   );
 }
@@ -131,7 +149,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     padding: 12,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#e0e0e0ff",
     marginBottom: 10,
     borderRadius: 20,
     shadowColor: "#000",
@@ -142,19 +160,20 @@ const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
   },
+  title: {
+    /* Replace fonts for title and stuff */
+    marginBottom: 5,
+    color: '#000000',
+  },
+  author: {
+    fontSize: 13,
+    opacity: 0.7,
+    color: '#000000',
+    marginBottom: 6,
+  },
   image: {
     width: '100%',
     height: 200,
     borderRadius: 20,
-    marginBottom: 10,
-  },
-  title: {
-    marginBottom: 8,
-    color: '#000000',
-  },
-  author: {
-    fontSize: 14,
-    opacity: 0.7,
-    color: '#000000',
   },
 });
