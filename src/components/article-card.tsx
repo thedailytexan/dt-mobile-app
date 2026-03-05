@@ -92,7 +92,7 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
   if (!post) {
     return (
       <ThemedView style={[styles.card, styles.center]}>
-        <ThemedText>No articles found</ThemedText>
+        <ThemedText style={{ color: '#000000' }}>No articles found</ThemedText>
       </ThemedView>
     );
   }
@@ -124,22 +124,26 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
 
 const styles = StyleSheet.create({
   card: {
-    padding: 16,
+    width: '100%',
+    padding: 12,
+    backgroundColor: "#ffffff",
+    marginBottom: 10,
     borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'gray',
-    marginVertical: 8,
-    minHeight: 100,
-    justifyContent: 'center',
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   center: {
     alignItems: 'center',
   },
   title: {
     marginBottom: 8,
+    color: '#000000',
   },
   author: {
     fontSize: 14,
     opacity: 0.7,
+    color: '#000000',
   },
 });
