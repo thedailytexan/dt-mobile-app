@@ -139,7 +139,7 @@ export function MediumArticleCard({ category, index = 0 }: MediumArticleCardProp
         <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
           {decodedTitle}
         </ThemedText>
-        <ThemedText type="default" style={styles.author}>
+        <ThemedText type="default" style={styles.author} numberOfLines={1}>
           {metaText}
         </ThemedText>
       </View>

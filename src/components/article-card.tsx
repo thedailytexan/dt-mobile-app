@@ -135,7 +135,7 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
       <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
         {decodedTitle}
       </ThemedText>
-      <ThemedText type="default" style={styles.author}>
+      <ThemedText type="default" style={styles.author} numberOfLines={1}>
         {metaText}
       </ThemedText>
       {post.featured_media > 0 && (

@@ -10,7 +10,7 @@ export default function Sports() {
         <SmallArticleCard category="Sports" index={0} />
         <SmallArticleCard category="Sports" index={1} />
       </View>
-      <MediumArticleCard category="Sports" index={1}/>
+      <MediumArticleCard category="Sports" index={3}/>
     </View>
   );
 }
