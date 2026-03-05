@@ -3,7 +3,7 @@ import { ArticleCard } from "../../src/components/article-card";
 
 export default function Home() {
   return (
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 60 }}>
       <Text style={{ paddingBottom: 5, paddingLeft: 5}}>News</Text>
       <ArticleCard category="News" index = {4} />
       <Text style={{ paddingBottom: 5, paddingLeft: 5}}>Sports</Text>
@@ -18,8 +18,6 @@ export default function Home() {
       <ArticleCard category="Multimedia" />
       <Text style={{ paddingBottom: 5, paddingLeft: 5}}>Texan en Español</Text>
       <ArticleCard category="Texan en Español" />
-      <Text style={{ paddingBottom: 5, paddingLeft: 5}}>Flipbooks / Print</Text>
-      <ArticleCard category="Flipbooks / Print" />
       <Text style={{ paddingBottom: 5, paddingLeft: 5}}>Obituaries</Text>
       <ArticleCard category="Obituaries" />
     </ScrollView>

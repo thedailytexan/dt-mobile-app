@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
+import { WPImage } from './wp-image';
 
 type WPPost = {
   id: number;
+  featured_media: number;
   title: {
     rendered: string;
   };
@@ -112,6 +114,9 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
 
   return (
     <ThemedView style={styles.card}>
+      {post.featured_media > 0 && (
+        <WPImage imageid={post.featured_media} style={styles.image} />
+      )}
       <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
         {decodedTitle}
       </ThemedText>
@@ -128,7 +133,7 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: "#ffffff",
     marginBottom: 10,
-    borderRadius: 8,
+    borderRadius: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -136,6 +141,12 @@ const styles = StyleSheet.create({
   },
   center: {
     alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 20,
+    marginBottom: 10,
   },
   title: {
     marginBottom: 8,
