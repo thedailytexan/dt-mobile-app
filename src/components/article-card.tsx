@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
   title: {
     /* Replace fonts for title and stuff */
     marginBottom: 5,
+    lineHeight: 22,
     color: '#000000',
   },
   author: {
