@@ -4,6 +4,9 @@ import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDebounce } from "../../hooks/useDebounce";
 import { searchArticles } from "../../services/articlesAPI";
+import { SearchArticleCard } from "../../src/components/search-article-card";
+import { SmallArticleCard } from "../../src/components/small-article-card";
+import { CategoryCard } from "../../src/components/category-card";
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,6 +15,33 @@ export default function Search() {
   const [initialLoading, setInitialLoading] = useState(true);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const trendingIndexes = Array.from({ length: 10 }, (_, i) => i);
+  const categories = [
+    {
+      title: "News",
+      image: require("../../assets/images/news.jpg"),
+    },
+    {
+      title: "Sports",
+      image: require("../../assets/images/sports.jpg"),
+    },
+    {
+      title: "Life & Arts",
+      image: require("../../assets/images/life-and-arts.jpg"),
+    },
+    {
+      title: "Opinion",
+      image: require("../../assets/images/opinion.jpg"),
+    },
+    {
+      title: "Longform",
+      image: require("../../assets/images/longform.jpg"),
+    },
+    {
+      title: "Multimedia",
+      image: require("../../assets/images/multimedia.jpg"),
+    },
+  ];
 
   const performSearch = async (query) => {
     const results = await searchArticles({
@@ -46,10 +76,12 @@ export default function Search() {
         // sort the search results so that articles with query in the title appear first
         const sortedResults = results.sort((a, b) => {
           const query = debouncedSearchQuery.toLowerCase();
-          const aTitleMatch = stripHtml(a.title).toLowerCase().includes(query);
-          const bTitleMatch = stripHtml(b.title).toLowerCase().includes(query);
-          if (aTitleMatch && !bTitleMatch) return -1;
-          if (!aTitleMatch && bTitleMatch) return 1;
+          const aTitle = a.title?.rendered || "";
+          const bTitle = b.title?.rendered || "";
+          const aMatch = aTitle.toLowerCase().includes(query);
+          const bMatch = bTitle.toLowerCase().includes(query);
+          if (aMatch && !bMatch) return -1;
+          if (!aMatch && bMatch) return 1;
           return 0;
         });
         setArticles(sortedResults);
@@ -74,7 +106,7 @@ export default function Search() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, paddingHorizontal: 16 }}>
 
       {/* search bar */}
       <View
@@ -87,11 +119,7 @@ export default function Search() {
           borderRadius: 30,
           borderWidth: 1,
           borderColor: "#e0e0e0",
-          marginBottom: 15,
-          shadowColor: "#000",
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 2,
+          marginBottom: 10,
         }}
       >
         {/* search icon */}
@@ -105,7 +133,7 @@ export default function Search() {
             fontSize: 16,
             color: "#000",
           }}
-          placeholder="Search articles"
+          placeholder="Search The Daily Texan"
           placeholderTextColor="#999"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -114,31 +142,51 @@ export default function Search() {
 
         {/* little X button, idk what to call it */}
         {searchQuery.length > 0 && (
-          <Pressable
-            onPress={() => setSearchQuery("")}
-            style={{
-              padding: 4,
-            }}
-          >
+          <Pressable onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color="#888" />
           </Pressable>
         )}
       </View>
 
       {/* results header */}
-      <View style={{ marginTop: 20, marginBottom: 10 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-          {searchQuery
-            ? `Results for "${searchQuery}"`
-            : "Popular Articles"}
-        </Text>
-        <Text style={{ color: "gray", marginTop: 4 }}>
-          {articles.length} found
+      <View style={{ marginBottom: 10 }}>
+        <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+          {searchQuery ? `Results for "${searchQuery}"` : "Trending"}
         </Text>
       </View>
 
-      {/* loading search results */}
-      {loading ? (
+      {/* the main screen */}
+      {!searchQuery ? (
+        <>
+          <FlatList
+            data={trendingIndexes}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.toString()}
+            renderItem={({ item }) => (
+              <View style={{ marginRight: 12 }}>
+                <SmallArticleCard index={item} />
+              </View>
+            )}
+          />
+          {/* Category grid */}
+          <View style={{ marginBottom: 10, marginTop: 10 }}>
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>
+              {"Sections"}
+            </Text>
+          </View>
+          <FlatList
+            data={categories}
+            numColumns={2}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.title}
+            columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 12, }}
+            renderItem={({ item }) => (
+              <CategoryCard title={item.title} image={item.image} />
+            )}
+          />
+        </>
+      ) : loading ? (
         <View style={{ marginTop: 20, alignItems: "center" }}>
           <ActivityIndicator />
           <Text style={{ marginTop: 8 }}>Searching...</Text>
@@ -148,26 +196,13 @@ export default function Search() {
           data={articles}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View
-              style={{
-                padding: 12,
-                backgroundColor: "#ffffff",
-                marginBottom: 10,
-                borderRadius: 8,
-                shadowColor: "#000",
-                shadowOpacity: 0.05,
-                shadowRadius: 4,
-                elevation: 2,
-              }}
-            >
-              {/* TODO: add more stuff here for the search results (date, category, image, etc.) */}
-              <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                {highlightText(stripHtml(item.title), searchQuery)}
-              </Text>
-              <Text style={{ color: "gray", marginTop: 4 }}>
-                {stripHtml(item.excerpt).slice(0, 100)}...
-              </Text>
-            </View>
+            <SearchArticleCard
+              title={item.title}
+              metaText={item.metaText}
+              mediaId={item.mediaId}
+              excerpt={item.excerpt}
+              searchQuery={debouncedSearchQuery}
+            />
           )}
           ListEmptyComponent={<NoResultsFound />}
         />
@@ -190,23 +225,23 @@ function NoResultsFound() {
   );
 }
 
-function highlightText(text, query) {
-  if (!query) return text;
+// function highlightText(text, query) {
+//   if (!query) return text;
 
-  const parts = text.split(new RegExp(`(${query})`, "gi"));
+//   const parts = text.split(new RegExp(`(${query})`, "gi"));
 
-  return parts.map((part, index) =>
-    part.toLowerCase() === query.toLowerCase() ? (
-      <Text key={index} style={{ backgroundColor: "yellow" }}>
-        {part}
-      </Text>
-    ) : (
-      part
-    )
-  );
-}
+//   return parts.map((part, index) =>
+//     part.toLowerCase() === query.toLowerCase() ? (
+//       <Text key={index} style={{ backgroundColor: "#ffe066", borderRadius: 4, paddingHorizontal: 2 }}>
+//         {part}
+//       </Text>
+//     ) : (
+//       part
+//     )
+//   );
+// }
 
-// helper function to remove html tags
-function stripHtml(html) {
-  return html ? html.replace(/<[^>]*>/g, "") : "";
-}
+// // helper function to remove html tags
+// function stripHtml(html) {
+//   return html ? html.replace(/<[^>]*>/g, "") : "";
+// }

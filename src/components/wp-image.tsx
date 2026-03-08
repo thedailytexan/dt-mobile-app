@@ -48,6 +48,15 @@ export function WPImage({ imageid, style }: WPImageProps) {
     fetchImageDetails();
   }, [imageid]);
 
+  if (!imageUrl) {
+    return (
+      <Image
+        source={require("../../assets/images/DT_logo.png")}
+        style={style}
+      />
+    );
+  }
+
   if (loading) {
     return (
       <View style={[styles.placeholder, style, styles.center]}>
