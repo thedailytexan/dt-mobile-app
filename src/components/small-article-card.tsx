@@ -140,7 +140,8 @@ export function SmallArticleCard({ category, index = 0 }: SmallArticleCardProps 
 
 const styles = StyleSheet.create({
   card: {
-    width: '48%',
+    width: 200,
+    height: 250,
     backgroundColor: "#e0e0e0ff",
     marginBottom: 16,
     borderRadius: 20,
