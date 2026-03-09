@@ -10,7 +10,7 @@ import { CategoryCard } from "../../src/components/category-card";
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
@@ -43,7 +43,7 @@ export default function Search() {
     },
   ];
 
-  const performSearch = async (query) => {
+  const performSearch = async (query: string) => {
     const results = await searchArticles({
       query,
       order: "desc",
@@ -74,7 +74,7 @@ export default function Search() {
       try {
         const results = await performSearch(debouncedSearchQuery);
         // sort the search results so that articles with query in the title appear first
-        const sortedResults = results.sort((a, b) => {
+        const sortedResults = results.sort((a: any, b: any) => {
           const query = debouncedSearchQuery.toLowerCase();
           const aTitle = a.title?.rendered || "";
           const bTitle = b.title?.rendered || "";
@@ -201,7 +201,6 @@ export default function Search() {
               metaText={item.metaText}
               mediaId={item.mediaId}
               excerpt={item.excerpt}
-              searchQuery={debouncedSearchQuery}
             />
           )}
           ListEmptyComponent={<NoResultsFound />}
