@@ -126,7 +126,7 @@ export function MediumArticleCard({ category, index = 0 }: MediumArticleCardProp
     year: 'numeric',
   });
 
-  const metaText = [authorName, categoryName, formattedDate].filter(Boolean).join(' | ');
+  const metaText = [authorName, formattedDate, categoryName].filter(Boolean).join(' | ');
 
   const decodedTitle = decodeHTMLEntities(post.title.rendered);
 
@@ -136,7 +136,7 @@ export function MediumArticleCard({ category, index = 0 }: MediumArticleCardProp
         <WPImage imageid={post.featured_media} style={styles.image} />
       )}
       <View style={styles.textContainer}>
-        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
+        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
           {decodedTitle}
         </ThemedText>
         <ThemedText type="default" style={styles.author} numberOfLines={1}>
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     justifyContent: 'center',
-    padding: 12,
+    paddingInline: 12,
   },
   center: {
     alignItems: 'center',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   title: {
     /* Replace fonts for title and stuff */
     marginBottom: 5,
-    lineHeight: 22,
+    lineHeight: 19,
     color: '#000000',
   },
   author: {

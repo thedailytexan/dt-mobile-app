@@ -127,7 +127,7 @@ export function SmallArticleCard({ category, index = 0 }: SmallArticleCardProps 
         <WPImage imageid={post.featured_media} style={styles.image} />
       )}
       <View style={styles.textContainer}>
-        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
+        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={4}>
           {decodedTitle}
         </ThemedText>
         <ThemedText type="default" style={styles.author}>
@@ -165,8 +165,10 @@ const styles = StyleSheet.create({
   },
   title: {
     /* Replace fonts for title and stuff */
-    marginBottom: 5,
-    lineHeight: 22,
+    fontSize: 15,
+    marginTop: 2,
+    marginBottom: 2,
+    lineHeight: 15,
     color: '#000000',
   },
   author: {

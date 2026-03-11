@@ -126,13 +126,13 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
     year: 'numeric',
   });
 
-  const metaText = [authorName, categoryName, formattedDate].filter(Boolean).join(' | ');
+  const metaText = [authorName, formattedDate, categoryName].filter(Boolean).join(' | ');
 
   const decodedTitle = decodeHTMLEntities(post.title.rendered);
 
   return (
     <ThemedView style={styles.card}>
-      <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
+      <ThemedText type="defaultSemiBold" style={styles.title}>
         {decodedTitle}
       </ThemedText>
       <ThemedText type="default" style={styles.author} numberOfLines={1}>
