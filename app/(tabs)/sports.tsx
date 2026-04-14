@@ -11,19 +11,41 @@ import { SvgXml } from "react-native-svg";
 
 const BASE_URL = "https://ncaa-api.henrygd.me";
 
+
+const SPORTS = [
+  { sport: "football", division: "fbs", label: "FB" },
+  { sport: "basketball-men", division: "d1", label: "MBB" },
+  { sport: "basketball-women", division: "d1", label: "WBB" },
+  { sport: "baseball", division: "d1", label: "MBA" },
+  { sport: "softball", division: "d1", label: "WSB" },
+];
+
+
 export default function Sports() {
   const [games, setGames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [logos, setLogos] = useState<{ [key: string]: string | null }>({}); // SVG text cache
 
   useEffect(() => {
+    console.log("fetching games");
     fetchTexasGames();
   }, []);
 
   // fetch logo 
   const fetchLogo = async (seo: string) => {
-    if (!seo || logos[seo]) return; // already cached
+    if (!seo) {
+      console.log("missing seo for logo");
+      return;
+    }
+
+    if (logos[seo]) {
+      console.log("logo already cached:", seo);
+      return;
+    }
+
     try {
+      console.log("fetching logo:", seo);
+
       const res = await fetch(`${BASE_URL}/logo/${seo}.svg`);
       const svgText = await res.text();
       setLogos((prev) => ({ ...prev, [seo]: svgText }));
@@ -33,64 +55,96 @@ export default function Sports() {
     }
   };
 
-  const fetchTexasGames = async () => {
-    console.log("fetchTexasGames...");
+// fetch one sport
+  const fetchSport = async (sport: string, division: string, label: string) => {
+    const year = new Date().getFullYear();
+    const url = `${BASE_URL}/scoreboard/${sport}/${division}/${year}/1/all-conf`;
+    console.log(`Fetching sport [${label}]`, url);
 
     try {
-      const now = new Date();
-      const currentSeason = now.getMonth() < 6 ? now.getFullYear() - 1 : now.getFullYear();
-      const seasons = [currentSeason, currentSeason - 1];
-      const seenGameIds = new Set();
-      let texasGames: any[] = [];
+      const res = await fetch(url);
 
-      for (const year of seasons) {
-        console.log("Season:", year);
+      console.log(`[${label}] status:`, res.status);
 
-        for (let week = 15; week >= 1; week--) {
-          try {
-            const res = await fetch(`${BASE_URL}/scoreboard/football/fbs/${year}/${week}/all-conf`);
-            const text = await res.text();
-            let data;
-            try {
-              data = JSON.parse(text);
-
-            } catch {
-              continue;
-            }
-
-            if (!data.games?.length) continue;
-
-            for (const g of data.games) {
-              const game = g.game;
-              if (!game?.home || !game?.away) continue;
-
-              const home = game.home.names.full;
-              const away = game.away.names.full;
-              const isTexas = home.includes("University of Texas at Austin") || away.includes("University of Texas at Austin");
-              if (!isTexas) continue;
-
-              console.log("Home SEO:", game.home.names.seo, "Away SEO:", game.away.names.seo);
-
-              if (seenGameIds.has(game.gameID)) continue;
-              seenGameIds.add(game.gameID);
-              texasGames.push(g);
-
-              // prefetch logos
-              fetchLogo(game.home.names.seo);
-              fetchLogo(game.away.names.seo);
-            }
-
-            if (texasGames.length >= 15) break;
-          } catch (err) {
-            console.log("Week failed:", year, week);
-          }
-        }
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.log(`JSON parse failed for ${label}`, text.slice(0, 300));
+        return [];
       }
 
-      console.log("Total Texas games:", texasGames.length);
-      setGames(texasGames);
+      if (!data?.games) {
+        console.log(`no games found for ${label}`, data);
+        return [];
+      }
+
+      console.log(`[${label}] total games:`, data.games.length);
+
+      const results: any[] = [];
+
+      for (const g of data.games) {
+        const game = g.game;
+        if (!game?.home || !game?.away) continue;
+
+        const home = game.home.names.seo;
+        const away = game.away.names.seo;
+        console.log("FOUND TEAMS:", home, "vs", away);
+
+        const isTexas =
+          home === "texas" ||
+          away === "texas";
+
+        if (!isTexas) continue;
+
+        results.push({
+          ...g,
+          sportLabel: label,
+        });
+      }
+
+      console.log(`[${label}] Texas games found:`, results.length);
+
+      return results;
     } catch (err) {
-      console.log("Error fetching games:", err);
+      console.log(`Fetch sport failed [${label}]`, err);
+      return [];
+    }
+  };
+
+
+  // main fetch
+  const fetchTexasGames = async () => {
+    setLoading(true);
+
+    try {
+
+      const results = await Promise.all(
+        SPORTS.map((s) => fetchSport(s.sport, s.division, s.label))
+      );
+
+      const merged = results.flat();
+
+      merged.sort((a, b) => {
+        const aState = a.game?.gameState === "final" ? 0 : 1;
+        const bState = b.game?.gameState === "final" ? 0 : 1;
+        return bState - aState;
+      });
+
+      setGames(merged);
+      // preload logos
+      const logoSet = new Set<string>();
+
+      merged.forEach((g) => {
+        const game = g.game;
+        if (!game?.home || !game?.away) return;
+        logoSet.add(game.home.names.seo);
+        logoSet.add(game.away.names.seo);
+      });
+
+      logoSet.forEach(fetchLogo);
+    } catch (err) {
     } finally {
       setLoading(false);
     }
@@ -104,15 +158,17 @@ export default function Sports() {
     );
   }
 
+  console.log("rendering games:", games.length);
+
+  // UI
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, paddingHorizontal: 16 }}>
       <View style={styles.container}>
-        <View style={{ marginBottom: 10 }}>
-          <Text style={{ fontSize: 30, fontWeight: "bold" }}>SPORTS</Text>
-        </View>
+        <Text style={styles.title}>SPORTS</Text>
+
         <View style={styles.divider} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {games.map((g) => {
+          {games.map((g, idx) => {
             const game = g.game;
             if (!game?.home || !game?.away) return null;
 
@@ -123,7 +179,8 @@ export default function Sports() {
             const second = isTexasHome ? away : home;
 
             return (
-              <View key={game.gameID} style={styles.card}>
+              <View key={game.gameID || idx} style={styles.card}>
+                <Text style={styles.sportLabel}>{g.sportLabel}</Text>
                 {/* TEXAS ROW */}
                 <View style={styles.row}>
                   {logos[first.names.seo] ? (
@@ -147,9 +204,9 @@ export default function Sports() {
                 </View>
 
                 {/* GAME STATE */}
-                <View>
-                  <Text style={styles.gameState}>{game.gameState?.toUpperCase()}</Text>
-                </View>
+                <Text style={styles.gameState}>
+                  {game.gameState?.toUpperCase()}
+                </Text>
               </View>
             );
           })}
@@ -169,13 +226,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  title: { 
+    fontSize: 30, 
+    fontWeight: "bold" 
+  },
   card: {
     width: 220,
-    height: 130,
+    height: 140,
     backgroundColor: "#fff",
     marginHorizontal: 5,
     padding: 15,
     borderRadius: 12,
+  },
+  sportLabel: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#555",
+    marginBottom: 6,
   },
   row: {
     flexDirection: "row",
@@ -186,6 +253,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 30,
     height: 30,
+    backgroundColor: "#ccc",
   },
   teamName: {
     flex: 1,
