@@ -151,7 +151,7 @@ export default function Search() {
       {/* results header */}
       <View style={{ marginBottom: 10 }}>
         <Text style={{ fontSize: 30, fontWeight: "bold" }}>
-          {searchQuery ? `Results for "${searchQuery}"` : "Trending"}
+          {searchQuery ? `Results for "${searchQuery}"` : "TRENDING"}
         </Text>
       </View>
 
@@ -172,7 +172,7 @@ export default function Search() {
           {/* Category grid */}
           <View style={{ marginBottom: 10, marginTop: 10 }}>
             <Text style={{ fontSize: 30, fontWeight: "bold" }}>
-              {"Sections"}
+              {"SECTIONS"}
             </Text>
           </View>
           <FlatList
