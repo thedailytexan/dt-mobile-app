@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { WPImage } from './wp-image';
@@ -18,35 +18,39 @@ const decodeHTMLEntities = (str: string) => {
 };
 
 type SearchArticleCardProps = {
+  id: number;
   title: string;
   metaText: string;
   mediaId?: number;
   excerpt: string;
+  onPress?: (id: number) => void;
 };
 
-export function SearchArticleCard({ title, metaText, mediaId, excerpt }: SearchArticleCardProps) {
+export function SearchArticleCard({ id, title, metaText, mediaId, excerpt, onPress }: SearchArticleCardProps) {
   const decodedTitle = decodeHTMLEntities(title);
   const decodedExcerpt = decodeHTMLEntities(excerpt.replace(/<[^>]+>/g, '')); // Strip HTML tags from excerpt
 
   return (
-    <ThemedView style={styles.card}>
-      {mediaId !== undefined && mediaId > 0 && (
-        <WPImage imageid={mediaId} style={styles.image} />
-      )}
-      <View style={styles.textContainer}>
-        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
-          {decodedTitle}
-        </ThemedText>
-        <ThemedText type="default" style={styles.author} numberOfLines={1}>
-          {metaText}
-        </ThemedText>
-        {decodedExcerpt ? (
-          <ThemedText type="default" style={styles.excerpt} numberOfLines={2}>
-            {decodedExcerpt}
+    <Pressable onPress={() => onPress?.(id)}>
+      <ThemedView style={styles.card}>
+        {mediaId !== undefined && mediaId > 0 && (
+          <WPImage imageid={mediaId} style={styles.image} />
+        )}
+        <View style={styles.textContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
+            {decodedTitle}
           </ThemedText>
-        ) : null}
-      </View>
-    </ThemedView>
+          <ThemedText type="default" style={styles.author} numberOfLines={1}>
+            {metaText}
+          </ThemedText>
+          {decodedExcerpt ? (
+            <ThemedText type="default" style={styles.excerpt} numberOfLines={2}>
+              {decodedExcerpt}
+            </ThemedText>
+          ) : null}
+        </View>
+      </ThemedView>
+    </Pressable>
   );
 }
 

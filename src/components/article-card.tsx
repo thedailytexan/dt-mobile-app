@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { WPImage } from './wp-image';
@@ -53,9 +53,10 @@ export const CATEGORY_IDS: Record<CategoryName, number> = {
 type ArticleCardProps = {
   category?: CategoryName;
   index?: number;
+  onPress?: (id: number) => void;
 };
 
-export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
+export function ArticleCard({ category, index = 0, onPress }: ArticleCardProps = {}) {
   const [post, setPost] = useState<WPPost | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -131,17 +132,19 @@ export function ArticleCard({ category, index = 0 }: ArticleCardProps = {}) {
   const decodedTitle = decodeHTMLEntities(post.title.rendered);
 
   return (
-    <ThemedView style={styles.card}>
-      <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
-        {decodedTitle}
-      </ThemedText>
-      <ThemedText type="default" style={styles.author} numberOfLines={1}>
-        {metaText}
-      </ThemedText>
-      {post.featured_media > 0 && (
-        <WPImage imageid={post.featured_media} style={styles.image} />
-      )}
-    </ThemedView>
+    <Pressable onPress={() => onPress?.(post.id)} style={{ width: '100%' }}>
+      <ThemedView style={styles.card}>
+        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={3}>
+          {decodedTitle}
+        </ThemedText>
+        <ThemedText type="default" style={styles.author} numberOfLines={1}>
+          {metaText}
+        </ThemedText>
+        {post.featured_media > 0 && (
+          <WPImage imageid={post.featured_media} style={styles.image} />
+        )}
+      </ThemedView>
+    </Pressable>
   );
 }
 

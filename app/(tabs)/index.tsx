@@ -2,9 +2,11 @@ import { Text, View, Image, FlatList, Dimensions } from "react-native";
 import { ArticleCard } from "../../src/components/article-card";
 import { SmallArticleCard } from "../../src/components/small-article-card";
 import { useFonts } from 'expo-font';
+import { useRouter } from 'expo-router';
 
 
 export default function Home() {
+  const router = useRouter();
   const screenWidth = Dimensions.get("window").width;
   const trendingIndexes = Array.from({ length: 10 }, (_, i) => i);
   const [loaded] = useFonts({
@@ -14,6 +16,10 @@ export default function Home() {
   if (!loaded) {
     return null;
   }
+
+  const handlePress = (id: number) => {
+    router.push(`/article/${id}`);
+  };
 
   return (
     <View>
@@ -38,7 +44,7 @@ export default function Home() {
         keyExtractor={(item) => item.toString()}
         renderItem={({ item }) => (
           <View style={{ paddingHorizontal: 16 }}>
-            <ArticleCard index={item} />
+            <ArticleCard index={item} onPress={handlePress} />
           </View>
         )}
       />
@@ -55,7 +61,7 @@ export default function Home() {
         keyExtractor={(item) => item.toString()}
         renderItem={({ item }) => (
           <View style={{ marginLeft: 13 }}>
-            <SmallArticleCard index={item} />
+            <SmallArticleCard index={item} onPress={handlePress} />
           </View>
         )}
       />

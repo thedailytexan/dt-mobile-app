@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View, Pressable } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { WPImage } from './wp-image';
@@ -53,9 +53,10 @@ export const CATEGORY_IDS: Record<CategoryName, number> = {
 type SmallArticleCardProps = {
   category?: CategoryName;
   index?: number;
+  onPress?: (id: number) => void;
 };
 
-export function SmallArticleCard({ category, index = 0 }: SmallArticleCardProps = {}) {
+export function SmallArticleCard({ category, index = 0, onPress }: SmallArticleCardProps = {}) {
   const [post, setPost] = useState<WPPost | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -122,19 +123,21 @@ export function SmallArticleCard({ category, index = 0 }: SmallArticleCardProps 
   const decodedTitle = decodeHTMLEntities(post.title.rendered);
 
   return (
-    <ThemedView style={styles.card}>
-      {post.featured_media > 0 && (
-        <WPImage imageid={post.featured_media} style={styles.image} />
-      )}
-      <View style={styles.textContainer}>
-        <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
-          {decodedTitle}
-        </ThemedText>
-        <ThemedText type="default" style={styles.author}>
-          {authorName}
-        </ThemedText>
-      </View>
-    </ThemedView>
+    <Pressable onPress={() => onPress?.(post.id)}>
+      <ThemedView style={styles.card}>
+        {post.featured_media > 0 && (
+          <WPImage imageid={post.featured_media} style={styles.image} />
+        )}
+        <View style={styles.textContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.title} numberOfLines={2}>
+            {decodedTitle}
+          </ThemedText>
+          <ThemedText type="default" style={styles.author}>
+            {authorName}
+          </ThemedText>
+        </View>
+      </ThemedView>
+    </Pressable>
   );
 }
 

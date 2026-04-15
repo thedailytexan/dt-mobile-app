@@ -4,11 +4,13 @@ import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDebounce } from "../../hooks/useDebounce";
 import { searchArticles } from "../../services/articlesAPI";
+import { useRouter } from "expo-router";
 import { SearchArticleCard } from "../../src/components/search-article-card";
 import { SmallArticleCard } from "../../src/components/small-article-card";
 import { CategoryCard } from "../../src/components/category-card";
 
 export default function Search() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -95,6 +97,10 @@ export default function Search() {
     handleSearch();
   }, [debouncedSearchQuery]);
 
+  const handlePress = (id: number) => {
+    router.push(`/article/${id}`);
+  };
+
   // loading screen for search tab
   if (initialLoading) {
     return (
@@ -165,7 +171,7 @@ export default function Search() {
             keyExtractor={(item) => item.toString()}
             renderItem={({ item }) => (
               <View style={{ marginRight: 12 }}>
-                <SmallArticleCard index={item} />
+                <SmallArticleCard index={item} onPress={handlePress} />
               </View>
             )}
           />
@@ -197,10 +203,12 @@ export default function Search() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <SearchArticleCard
+              id={item.id}
               title={item.title}
               metaText={item.metaText}
               mediaId={item.mediaId}
               excerpt={item.excerpt}
+              onPress={handlePress}
             />
           )}
           ListEmptyComponent={<NoResultsFound />}
