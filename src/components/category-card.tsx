@@ -11,7 +11,7 @@ type CategoryCardProps = {
 
 export function CategoryCard({ title, image, onPress }: CategoryCardProps) {
   return (
-    <Pressable onPress={onPress} style={{ flex: 1 }}>
+    <Pressable onPress={onPress}>
       <ImageBackground
         source={image}
         style={styles.card}

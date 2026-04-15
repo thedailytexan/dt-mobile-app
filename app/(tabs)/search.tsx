@@ -13,6 +13,7 @@ export default function Search() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const trendingIndexes = Array.from({ length: 10 }, (_, i) => i);
@@ -42,6 +43,79 @@ export default function Search() {
       image: require("../../assets/images/multimedia.jpg"),
     },
   ];
+
+
+  // category dummy data
+  const dummyArticlesByCategory: any = {
+    News: [
+      {
+        id: 1,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | News | April 14, 2026",
+        mediaId: 0,
+      },
+      {
+        id: 2,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | News | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+    Sports: [
+      {
+        id: 3,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | Sports | April 14, 2026",
+        mediaId: 0,
+      },
+      {
+        id: 4,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | Sports | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+    "Life & Arts": [
+      {
+        id: 5,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | Life & Arts | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+    Opinion: [
+      {
+        id: 6,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Writer | Opinion | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+    Longform: [
+      {
+        id: 7,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Longform | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+    Multimedia: [
+      {
+        id: 8,
+        title: "title",
+        excerpt: "excerpt",
+        metaText: "Multimedia | April 14, 2026",
+        mediaId: 0,
+      },
+    ],
+  };
 
   const performSearch = async (query: string) => {
     const results = await searchArticles({
@@ -151,13 +225,39 @@ export default function Search() {
       {/* results header */}
       <View style={{ marginBottom: 10 }}>
         <Text style={{ fontSize: 30, fontWeight: "bold" }}>
-          {searchQuery ? `Results for "${searchQuery}"` : "Trending"}
+          {searchQuery ? `Results for "${searchQuery}"` : selectedCategory ? selectedCategory : "Trending"}
         </Text>
       </View>
 
-      {/* the main screen */}
-      {!searchQuery ? (
+      {/* category display */}
+      {!searchQuery && selectedCategory ? (
         <>
+          <Pressable
+            onPress={() => setSelectedCategory(null)}
+            style={{ marginBottom: 10 }}
+          >
+            <Text style={{ fontSize: 16, fontWeight: "600" }}>
+              ← Back to Sections
+            </Text>
+          </Pressable>
+
+          <FlatList
+            data={dummyArticlesByCategory[selectedCategory] || []}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <SearchArticleCard
+                title={item.title}
+                metaText={item.metaText}
+                mediaId={item.mediaId}
+                excerpt={item.excerpt}
+              />
+            )}
+            ListEmptyComponent={<NoResultsFound />}
+          />
+        </>
+      ) : !searchQuery ? (
+        <>
+          {/* Trending */}
           <FlatList
             data={trendingIndexes}
             horizontal
@@ -182,7 +282,11 @@ export default function Search() {
             keyExtractor={(item) => item.title}
             columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 12, }}
             renderItem={({ item }) => (
-              <CategoryCard title={item.title} image={item.image} />
+              <View style={{ flex: 1, marginHorizontal: 3 }}>
+                <CategoryCard title={item.title} image={item.image}
+                  onPress={() => setSelectedCategory(item.title)}
+                />
+              </View>
             )}
           />
         </>
@@ -223,24 +327,3 @@ function NoResultsFound() {
     </View>
   );
 }
-
-// function highlightText(text, query) {
-//   if (!query) return text;
-
-//   const parts = text.split(new RegExp(`(${query})`, "gi"));
-
-//   return parts.map((part, index) =>
-//     part.toLowerCase() === query.toLowerCase() ? (
-//       <Text key={index} style={{ backgroundColor: "#ffe066", borderRadius: 4, paddingHorizontal: 2 }}>
-//         {part}
-//       </Text>
-//     ) : (
-//       part
-//     )
-//   );
-// }
-
-// // helper function to remove html tags
-// function stripHtml(html) {
-//   return html ? html.replace(/<[^>]*>/g, "") : "";
-// }
