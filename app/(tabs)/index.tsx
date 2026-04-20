@@ -33,7 +33,7 @@ export default function Home() {
       </View>
       <FlatList
         data={trendingIndexes}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
         style={{ height: 290 }}
         keyExtractor={(item) => item.toString()}
         renderItem={({ item }) => (
@@ -51,7 +51,7 @@ export default function Home() {
       <FlatList
         data={trendingIndexes}
         horizontal
-        showsHorizontalScrollIndicator={false}
+        showsHorizontalScrollIndicator={true}
         keyExtractor={(item) => item.toString()}
         renderItem={({ item }) => (
           <View style={{ marginLeft: 13 }}>

@@ -26,13 +26,13 @@ export default function Profile() {
     return null;
   }
 
-  const preferenceRoutes: Record<string, string> = {
+  const preferenceRoutes: Record<string, any> = {
     "Accessibility": "/profile-pages/accessibility",
     "Notifications": "/profile-pages/notifications",
     "Appearance": "/profile-pages/appearance",
   };
 
-  const aboutRoutes: Record<string, string> = {
+  const aboutRoutes: Record<string, any> = {
     "The Daily Texan": "/profile-pages/daily-texan",
     "Contact Us": "/profile-pages/contact",
     "Subscribe to our Newsletter": "/profile-pages/newsletter",
@@ -78,7 +78,7 @@ export default function Profile() {
         <FlatList
           data={trendingIndexes}
           horizontal
-          showsHorizontalScrollIndicator={false}
+          showsHorizontalScrollIndicator={true}
           keyExtractor={(item) => item.toString()}
           renderItem={({ item }) => (
             <View style={{ marginLeft: 13 }}>
