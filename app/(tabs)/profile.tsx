@@ -1,20 +1,23 @@
-import { Text, View, Image, Dimensions, FlatList } from "react-native";
+import { Text, View, Image, Dimensions, FlatList, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SmallArticleCard } from "../../src/components/small-article-card";
 import { useFonts } from 'expo-font';
+import { useRouter } from "expo-router";
 
 export default function Profile() {
+  const router = useRouter();
   const screenWidth = Dimensions.get("window").width;
   const trendingIndexes = Array.from({ length: 10 }, (_, i) => i);
   const preferenceItems = ["Accessibility", "Notifications", "Appearance"];
   const aboutItems = [
     "The Daily Texan",
     "Contact Us",
-    "Subscribe to our NewsLetter",
+    "Subscribe to our Newsletter",
     "Privacy Policy",
     "Support Student Media",
     "Terms and Conditions",
   ];
+  
   const [loaded] = useFonts({
     LibreBaskerville: require('../../assets/fonts/Libre-Baskerville.ttf'),
   });
@@ -23,9 +26,31 @@ export default function Profile() {
     return null;
   }
 
-  function MenuRow({ label }: { label: string }) {
+  const preferenceRoutes: Record<string, string> = {
+    "Accessibility": "/profile-pages/accessibility",
+    "Notifications": "/profile-pages/notifications",
+    "Appearance": "/profile-pages/appearance",
+  };
+
+  const aboutRoutes: Record<string, string> = {
+    "The Daily Texan": "/profile-pages/daily-texan",
+    "Contact Us": "/profile-pages/contact",
+    "Subscribe to our Newsletter": "/profile-pages/newsletter",
+    "Privacy Policy": "/profile-pages/privacy",
+    "Support Student Media": "/profile-pages/student-media",
+    "Terms and Conditions": "/profile-pages/terms",
+  };
+
+  function MenuRow({ label, onPress }: { label: string; onPress?: () => void }) {
     return (
-      <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => ({
+          paddingHorizontal: 16,
+          marginTop: 10,
+          opacity: pressed ? 0.5 : 1,
+        })}
+      >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={{ fontSize: 15 }}>{label}</Text>
           <Image
@@ -33,7 +58,7 @@ export default function Profile() {
             style={{ width: 23, height: 23, resizeMode: 'contain' }}
           />
         </View>
-      </View>
+      </Pressable>
     );
   }
 
@@ -61,7 +86,13 @@ export default function Profile() {
             </View>
           )}
         />
-        <View style={{ paddingHorizontal: 16 }}>
+        <Pressable
+          onPress={() => router.push("/profile-pages/bookmarks")}
+          style={({ pressed }) => ({
+            paddingHorizontal: 16,
+            opacity: pressed ? 0.5 : 1,
+          })}
+        >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={{ fontSize: 15 }}>View all bookmarks</Text>
             <Image
@@ -69,7 +100,7 @@ export default function Profile() {
               style={{ width: 23, height: 23, resizeMode: 'contain' }}
             />
           </View>
-        </View>
+        </Pressable>
       </View>
       <View style={{ alignItems: 'center', marginTop: 10 }}>
         <View style={{ height: 2.3, backgroundColor: "#000000", width: screenWidth, paddingHorizontal: 10, opacity: 0.25 }}></View>
@@ -79,7 +110,9 @@ export default function Profile() {
       <View style={{ marginTop: 10, justifyContent: "flex-start" }}>
         <Text style={{ fontSize: 18, fontWeight: '500', paddingHorizontal: 16 }}>Preferences</Text>
         {preferenceItems.map((item) => (
-          <MenuRow key={item} label={item} />
+          <MenuRow key={item} label={item}
+          onPress={() => router.push(preferenceRoutes[item])}
+          />
         ))}
       </View>
       <View style={{ alignItems: 'center', marginTop: 10 }}>
@@ -90,7 +123,9 @@ export default function Profile() {
       <View style={{ marginTop: 10, justifyContent: "flex-start" }}>
         <Text style={{ fontSize: 18, fontWeight: '500', paddingHorizontal: 16 }}>About</Text>
         {aboutItems.map((item) => (
-          <MenuRow key={item} label={item} />
+          <MenuRow key={item} label={item}
+          onPress={() => router.push(aboutRoutes[item])}
+          />
         ))}
       </View>
 
